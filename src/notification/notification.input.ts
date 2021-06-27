@@ -1,3 +1,7 @@
 export interface NotificationInput {
-  items: string[];
+  destinations: string[];
+  enSubject: string;
+  arSubject: string;
+  enBody: string;
+  arBody: string;
 }

@@ -14,13 +14,13 @@ export class NotificationController {
 
   @Post('/push')
   async push(@Body() input: NotificationInput) {
-    this.notificationService.setStrategy(this.pushService);
+    this.notificationService.setNotificationStrategy(this.pushService);
     await this.notificationService.send(input);
   }
 
   @Post('/sms')
   async sms(@Body() input: NotificationInput) {
-    this.notificationService.setStrategy(this.smsService);
+    this.notificationService.setNotificationStrategy(this.smsService);
     await this.notificationService.send(input);
   }
 }

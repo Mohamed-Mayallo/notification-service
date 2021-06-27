@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { INotificationStrategy } from './notification-strategy.interface';
+import { BaseHttpException } from 'src/_common/exceptions/base-http-exception';
+import { NotificationStrategy } from './notification-strategy.interface';
 import { NotificationInput } from './notification.input';
 
 @Injectable()
 export class NotificationService {
-  private strategy: INotificationStrategy;
+  private strategy: NotificationStrategy;
 
-  constructor(strategy: INotificationStrategy) {
-    this.strategy = strategy;
-  }
-
-  setStrategy(strategy: INotificationStrategy) {
+  setNotificationStrategy(strategy: NotificationStrategy) {
     this.strategy = strategy;
   }
 
   async send(input: NotificationInput) {
+    if (!this.strategy) throw new BaseHttpException('EN', 111);
     await this.strategy.send(input);
   }
 }

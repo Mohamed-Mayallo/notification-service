@@ -1,4 +1,4 @@
 export interface IProviderStrategy {
-  sendToSingle(item: string): Promise<void>;
-  sendToMulti(items: string[]): Promise<void>;
+  sendToSingle(destination: string): Promise<void>;
+  sendToMulti(destinations: string[]): Promise<void>;
 }
