@@ -5,14 +5,14 @@ import { NotificationInput } from './notification.input';
 
 @Injectable()
 export class NotificationService {
-  private strategy: NotificationStrategy;
+  private notificationStrategy: NotificationStrategy;
 
-  setNotificationStrategy(strategy: NotificationStrategy) {
-    this.strategy = strategy;
+  setNotificationStrategy(notificationStrategy: NotificationStrategy) {
+    this.notificationStrategy = notificationStrategy;
   }
 
   async send(input: NotificationInput) {
-    if (!this.strategy) throw new BaseHttpException('EN', 111);
-    await this.strategy.send(input);
+    if (!this.notificationStrategy) throw new BaseHttpException('EN', 600);
+    await this.notificationStrategy.send(input);
   }
 }
