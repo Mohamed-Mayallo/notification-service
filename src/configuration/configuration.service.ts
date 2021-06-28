@@ -1,16 +1,12 @@
-import { BaseHttpException } from 'src/_common/exceptions/base-http-exception';
 import { Configuration, ConfigurationDocument } from './configuration.schema';
-import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateConfigurationInput } from './configuration.input';
 import { ConfigurationKeyEnum, ConfigurationValueEnum } from './configuration.enum';
+import { ConfigurationRepository } from './configuration.repository';
 
 @Injectable()
 export class ConfigurationService {
-  constructor(
-    @InjectModel(Configuration.name) private configurationModel: Model<ConfigurationDocument>
-  ) {}
+  constructor(private configurationRepository: ConfigurationRepository) {}
 
   async updateConfiguration(input: UpdateConfigurationInput): Promise<Configuration> {
     const configuration = await this.configurationByKeyOrError(input.key);
@@ -20,8 +16,8 @@ export class ConfigurationService {
   private async configurationByKeyOrError(
     key: ConfigurationKeyEnum
   ): Promise<ConfigurationDocument> {
-    const configuration = await this.configurationModel.findOne({ key });
-    if (!configuration) throw new BaseHttpException('EN', 613);
+    const configuration = await this.configurationRepository.findOne({ key });
+    if (!configuration) throw new NotFoundException();
     return configuration;
   }
 
@@ -29,10 +25,7 @@ export class ConfigurationService {
     configuration: ConfigurationDocument,
     input: UpdateConfigurationInput
   ): Promise<Configuration> {
-    if (input.value) configuration.value = input.value;
-    if (input.displayedOnBoardAs) configuration.displayedOnBoardAs = input.displayedOnBoardAs;
-    await configuration.save();
-    return configuration.toJSON();
+    return await this.configurationRepository.updateOneFromExistingModel(configuration, input);
   }
 
   async getDefaultSmsProvider(): Promise<ConfigurationValueEnum> {

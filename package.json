@@ -29,7 +29,6 @@
     "@nestjs/schedule": "^0.4.2",
     "@nestjs/serve-static": "^2.1.4",
     "bcryptjs": "^2.4.3",
-    "bull": "^3.20.0",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "compression": "^1.7.4",
@@ -49,7 +48,10 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
     "twilio": "^3.49.4",
-    "uuid": "^8.3.0"
+    "uuid": "^8.3.0",
+    "bull": "^3.22.0",
+    "bull-board": "^1.5.1",
+    "bullmq": "^1.15.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.6",

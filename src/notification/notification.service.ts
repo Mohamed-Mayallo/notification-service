@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { BaseHttpException } from 'src/_common/exceptions/base-http-exception';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { NotificationStrategy } from './notification-strategy.interface';
 import { NotificationInput } from './notification.input';
 
@@ -12,7 +11,7 @@ export class NotificationService {
   }
 
   async send(input: NotificationInput) {
-    if (!this.notificationStrategy) throw new BaseHttpException('EN', 600);
+    if (!this.notificationStrategy) throw new ForbiddenException();
     await this.notificationStrategy.send(input);
   }
 }
