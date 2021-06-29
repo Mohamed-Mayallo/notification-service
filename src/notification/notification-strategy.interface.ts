@@ -8,7 +8,7 @@ export abstract class NotificationStrategy {
 
   abstract defineDefaultProvider(): Promise<IProviderStrategy>;
   abstract saveLog(input: NotificationInput, response: SendResponse): Promise<void>;
-  abstract productNotificationsQueue(
+  abstract produceNotificationsQueue(
     input: NotificationInput,
     overrideQueueDelayInMS?: number
   ): Promise<void>;
@@ -20,7 +20,7 @@ export abstract class NotificationStrategy {
   }
 
   private async defineAppropriateSender(input: NotificationInput) {
-    if (this.isMulti(input.destinations)) await this.sendToMultiAndSaveLog(input);
+    if (this.isMulti(input.destinations)) await this.addNotificationsToQueue(input);
     else await this.sendToSingleAndSaveLog(input);
   }
 
@@ -39,13 +39,12 @@ export abstract class NotificationStrategy {
   }
 
   private async addNotificationsToQueue(input: NotificationInput) {
-    const delayForFirstQueueInMS = 0;
     for (
-      let start = 0;
+      let start = 0, queueOrder = 1;
       start < input.destinations.length;
-      start + this.limitOfSentNotificationsInMinute
+      start += this.limitOfSentNotificationsInMinute, queueOrder++
     ) {
-      await this.productNotificationsQueue(
+      await this.produceNotificationsQueue(
         {
           ...input,
           destinations: input.destinations.slice(
@@ -53,8 +52,14 @@ export abstract class NotificationStrategy {
             start + this.limitOfSentNotificationsInMinute
           )
         },
-        start === 0 ? delayForFirstQueueInMS : this.queueDelayInMS
+        this.defineQueueDelayInMS(start === 0, queueOrder)
       );
     }
+  }
+
+  private defineQueueDelayInMS(isFirstQueue = false, queueOrder: number) {
+    const delayForFirstQueueInMS = 0;
+    if (isFirstQueue) return delayForFirstQueueInMS;
+    return this.queueDelayInMS * queueOrder;
   }
 }

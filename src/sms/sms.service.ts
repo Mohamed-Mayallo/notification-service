@@ -46,7 +46,7 @@ export class SmsService extends NotificationStrategy {
     });
   }
 
-  async productNotificationsQueue(input: NotificationInput, overrideQueueDelayInMS?: number) {
+  async produceNotificationsQueue(input: NotificationInput, overrideQueueDelayInMS?: number) {
     await this.smsNotificationsQueue.add('SmsNotificationsHandler', input, {
       delay: overrideQueueDelayInMS !== undefined ? overrideQueueDelayInMS : this.queueDelayInMS
     });

@@ -16,9 +16,13 @@ export class ConfigurationService {
   private async configurationByKeyOrError(
     key: ConfigurationKeyEnum
   ): Promise<ConfigurationDocument> {
-    const configuration = await this.configurationRepository.findOne({ key });
+    const configuration = await this.configurationByKey(key);
     if (!configuration) throw new NotFoundException();
     return configuration;
+  }
+
+  private async configurationByKey(key: ConfigurationKeyEnum): Promise<ConfigurationDocument> {
+    return await this.configurationRepository.findOne({ key });
   }
 
   private async updateConfigurationFieldsAndReturnRaw(
@@ -29,16 +33,14 @@ export class ConfigurationService {
   }
 
   async getDefaultSmsProvider(): Promise<ConfigurationValueEnum> {
-    const configuration = await this.configurationByKeyOrError(
-      ConfigurationKeyEnum.DEFAULT_SMS_SERVICE
-    );
-    return configuration.value;
+    const configuration = await this.configurationByKey(ConfigurationKeyEnum.DEFAULT_SMS_SERVICE);
+    return configuration ? configuration.value : ConfigurationValueEnum.AWS_SNS;
   }
 
   async getDefaultPusherProvider(): Promise<ConfigurationValueEnum> {
-    const configuration = await this.configurationByKeyOrError(
+    const configuration = await this.configurationByKey(
       ConfigurationKeyEnum.DEFAULT_PUSHER_SERVICE
     );
-    return configuration.value;
+    return configuration ? configuration.value : ConfigurationValueEnum.FIREBASE_PUSHER;
   }
 }

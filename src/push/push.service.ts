@@ -46,7 +46,7 @@ export class PushService extends NotificationStrategy {
     });
   }
 
-  async productNotificationsQueue(input: NotificationInput, overrideQueueDelayInMS?: number) {
+  async produceNotificationsQueue(input: NotificationInput, overrideQueueDelayInMS?: number) {
     await this.pushNotificationsQueue.add('PushNotificationsHandler', input, {
       delay: overrideQueueDelayInMS !== undefined ? overrideQueueDelayInMS : this.queueDelayInMS
     });
