@@ -1,4 +1,6 @@
+import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
+import { Queue } from 'bull';
 import { ConfigurationValueEnum } from 'src/configuration/configuration.enum';
 import { ConfigurationService } from 'src/configuration/configuration.service';
 import { NotificationStrategy } from 'src/notification/notification-strategy.interface';
@@ -15,7 +17,8 @@ export class PushService extends NotificationStrategy {
     private configurationService: ConfigurationService,
     private oneSignalProvider: OneSignalProvider,
     private firebaseProvider: FirebaseProvider,
-    private notificationRepository: NotificationRepository
+    private notificationRepository: NotificationRepository,
+    @InjectQueue('PushNotifications') private pushNotificationsQueue: Queue
   ) {
     super();
   }
@@ -40,6 +43,12 @@ export class PushService extends NotificationStrategy {
         arSubject: input.arSubject,
         enSubject: input.enSubject
       }
+    });
+  }
+
+  async productNotificationsQueue(input: NotificationInput, overrideQueueDelayInMS?: number) {
+    await this.pushNotificationsQueue.add('PushNotificationsHandler', input, {
+      delay: overrideQueueDelayInMS !== undefined ? overrideQueueDelayInMS : this.queueDelayInMS
     });
   }
 }

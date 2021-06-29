@@ -1,4 +1,6 @@
+import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
+import { Queue } from 'bull';
 import { ConfigurationValueEnum } from 'src/configuration/configuration.enum';
 import { ConfigurationService } from 'src/configuration/configuration.service';
 import { NotificationStrategy } from 'src/notification/notification-strategy.interface';
@@ -15,7 +17,8 @@ export class SmsService extends NotificationStrategy {
     private configurationService: ConfigurationService,
     private twilioProvider: TwilioProvider,
     private awsSnsProvider: AwsSnsProvider,
-    private notificationRepository: NotificationRepository
+    private notificationRepository: NotificationRepository,
+    @InjectQueue('SmsNotifications') private smsNotificationsQueue: Queue
   ) {
     super();
   }
@@ -40,6 +43,12 @@ export class SmsService extends NotificationStrategy {
         arSubject: input.arSubject,
         enSubject: input.enSubject
       }
+    });
+  }
+
+  async productNotificationsQueue(input: NotificationInput, overrideQueueDelayInMS?: number) {
+    await this.smsNotificationsQueue.add('SmsNotificationsHandler', input, {
+      delay: overrideQueueDelayInMS !== undefined ? overrideQueueDelayInMS : this.queueDelayInMS
     });
   }
 }
