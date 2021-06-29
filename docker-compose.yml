@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  main:
+    container_name: main
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - ${PORT}:${PORT}
+      - 9229:9229
+    command: npm run start
+    env_file:
+      - .env
+    networks:
+      - webnet
+    depends_on:
+      - redis
+      - mongo
+  redis:
+    container_name: redis
+    image: redis:6
+    command: redis-server --requirepass ${REDIS_PASS}
+    ports:
+      - ${REDIS_PORT}:6379
+    networks:
+      - webnet
+  mongo:
+    container_name: mongo
+    image: mongo
+    networks:
+      - webnet
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - mongoData:/data/db
+networks:
+  webnet:
+volumes:
+  mongoData:
