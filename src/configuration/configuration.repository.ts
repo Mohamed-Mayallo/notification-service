@@ -18,4 +18,8 @@ export class ConfigurationRepository {
     await model.save();
     return model.toJSON();
   }
+
+  async createOne(input: Partial<Configuration>) {
+    return await this.configurationModel.create(input);
+  }
 }

@@ -1,3 +1,4 @@
+import { ConfigurationService } from 'src/configuration/configuration.service';
 import { NotificationInput } from './notification.input';
 import { IProviderStrategy, SendResponse } from './provider-strategy.interface';
 
@@ -6,15 +7,16 @@ export abstract class NotificationStrategy {
   protected limitOfSentNotificationsInMinute: number = 10;
   protected queueDelayInMS: number = 1 * 60 * 1000;
 
-  abstract defineDefaultProvider(): Promise<IProviderStrategy>;
+  abstract defineDefaultProviderAndQueueConfig(): Promise<IProviderStrategy>;
   abstract saveLog(input: NotificationInput, response: SendResponse): Promise<void>;
+  abstract saveMultiLog(input: NotificationInput, response: SendResponse[]): Promise<void>;
   abstract produceNotificationsQueue(
     input: NotificationInput,
     overrideQueueDelayInMS?: number
   ): Promise<void>;
 
   async send(input: NotificationInput): Promise<void> {
-    const defaultProvider = await this.defineDefaultProvider();
+    const defaultProvider = await this.defineDefaultProviderAndQueueConfig();
     this.provider = defaultProvider;
     await this.defineAppropriateSender(input);
   }
@@ -35,7 +37,7 @@ export abstract class NotificationStrategy {
 
   public async sendToMultiAndSaveLog(input: NotificationInput) {
     const res = await this.provider.sendToMulti(input);
-    for (const singleRes of res) await this.saveLog(input, singleRes);
+    await this.saveMultiLog(input, res);
   }
 
   private async addNotificationsToQueue(input: NotificationInput) {
@@ -55,6 +57,12 @@ export abstract class NotificationStrategy {
         this.defineQueueDelayInMS(start === 0, queueOrder)
       );
     }
+  }
+
+  protected async loadQueueConfiguration(configurationService: ConfigurationService) {
+    this.limitOfSentNotificationsInMinute =
+      await configurationService.getLimitOfSentNotificationsInMinute();
+    this.queueDelayInMS = (await configurationService.getQueueDelayInSec()) * 1000;
   }
 
   private defineQueueDelayInMS(isFirstQueue = false, queueOrder: number) {

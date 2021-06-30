@@ -10,6 +10,14 @@ export class NotificationRepository {
   ) {}
 
   async createOne(notificationDetails: NotificationLog) {
-    await this.notificationLogModel.create(notificationDetails);
+    return await this.notificationLogModel.create(notificationDetails);
+  }
+
+  async createMany(notificationsDetails: NotificationLog[]) {
+    return await this.notificationLogModel.create(notificationsDetails);
+  }
+
+  async findAll() {
+    return await this.notificationLogModel.find();
   }
 }

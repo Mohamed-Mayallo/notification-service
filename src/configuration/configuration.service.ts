@@ -1,7 +1,7 @@
 import { Configuration, ConfigurationDocument } from './configuration.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateConfigurationInput } from './configuration.input';
-import { ConfigurationKeyEnum, ConfigurationValueEnum } from './configuration.enum';
+import { ConfigurationKeyEnum, NotificationProvidersEnum } from './configuration.enum';
 import { ConfigurationRepository } from './configuration.repository';
 
 @Injectable()
@@ -29,18 +29,33 @@ export class ConfigurationService {
     configuration: ConfigurationDocument,
     input: UpdateConfigurationInput
   ): Promise<Configuration> {
-    return await this.configurationRepository.updateOneFromExistingModel(configuration, input);
+    return await this.configurationRepository.updateOneFromExistingModel(
+      configuration,
+      input as unknown as Partial<Configuration>
+    );
   }
 
-  async getDefaultSmsProvider(): Promise<ConfigurationValueEnum> {
+  async getDefaultSmsProvider() {
     const configuration = await this.configurationByKey(ConfigurationKeyEnum.DEFAULT_SMS_SERVICE);
-    return configuration ? configuration.value : ConfigurationValueEnum.AWS_SNS;
+    return configuration ? configuration.value : NotificationProvidersEnum.AWS_SNS_SMS;
   }
 
-  async getDefaultPusherProvider(): Promise<ConfigurationValueEnum> {
+  async getDefaultPusherProvider() {
     const configuration = await this.configurationByKey(
       ConfigurationKeyEnum.DEFAULT_PUSHER_SERVICE
     );
-    return configuration ? configuration.value : ConfigurationValueEnum.FIREBASE_PUSHER;
+    return configuration ? configuration.value : NotificationProvidersEnum.FIREBASE_PUSHER;
+  }
+
+  async getQueueDelayInSec(): Promise<number> {
+    const configuration = await this.configurationByKey(ConfigurationKeyEnum.QUEUE_DELAY_IN_SEC);
+    return configuration && !isNaN(Number(configuration.value)) ? Number(configuration.value) : 60;
+  }
+
+  async getLimitOfSentNotificationsInMinute(): Promise<number> {
+    const configuration = await this.configurationByKey(
+      ConfigurationKeyEnum.LIMIT_OF_SENT_NOTIFICATIONS_IN_MINUTE
+    );
+    return configuration && !isNaN(Number(configuration.value)) ? Number(configuration.value) : 10;
   }
 }

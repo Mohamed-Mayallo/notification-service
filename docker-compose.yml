@@ -6,6 +6,9 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
+    environment:
+      DB_HOST: mongo
+      REDIS_HOST: redis
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -34,7 +37,7 @@ services:
     networks:
       - webnet
     ports:
-      - ${DB_PORT}:5432
+      - ${DB_PORT}:27017
     volumes:
       - mongoData:/data/db
 networks:

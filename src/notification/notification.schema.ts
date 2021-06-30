@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { NotificationProvidersEnum } from 'src/configuration/configuration.enum';
 import { FavoriteLangEnum } from 'src/user/user.type';
 import { NotificationStatusEnum, NotificationTypeEnum } from './notification.enum';
 
@@ -39,6 +40,9 @@ export class NotificationLog {
 
   @Prop({ required: true, default: 0 })
   retries: number;
+
+  @Prop({ required: true, enum: Object.keys(NotificationProvidersEnum) })
+  providerName: NotificationProvidersEnum;
 
   @Prop({ required: true, default: new Date(), type: Date })
   createdAt: Date;

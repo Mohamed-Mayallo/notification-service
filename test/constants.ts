@@ -1,0 +1,1 @@
+export const NOT_VALID_PHONE_NUMBER = '20584943';

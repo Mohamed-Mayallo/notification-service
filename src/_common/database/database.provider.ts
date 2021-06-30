@@ -4,6 +4,6 @@ import { databaseConfig } from './database.config';
 
 export const databaseProvider = MongooseModule.forRootAsync({
   imports: [ConfigModule],
-  useFactory: async (configService: ConfigService) => databaseConfig(configService),
+  useFactory: async (configService: ConfigService) => await databaseConfig(configService),
   inject: [ConfigService]
 });

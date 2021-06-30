@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
-import { ConfigurationKeyEnum, ConfigurationValueEnum } from './configuration.enum';
+import { ConfigurationKeyEnum } from './configuration.enum';
 
 export class UpdateConfigurationInput {
   @IsNotEmpty()
@@ -8,8 +8,8 @@ export class UpdateConfigurationInput {
 
   @ValidateIf(obj => !obj.displayedOnBoardAs)
   @IsNotEmpty()
-  @IsEnum(ConfigurationValueEnum)
-  value?: ConfigurationValueEnum;
+  @IsString()
+  value?: string;
 
   @ValidateIf(obj => !obj.value)
   @IsNotEmpty()
