@@ -49,13 +49,13 @@ export class ConfigurationService {
 
   async getQueueDelayInSec(): Promise<number> {
     const configuration = await this.configurationByKey(ConfigurationKeyEnum.QUEUE_DELAY_IN_SEC);
-    return configuration && !isNaN(Number(configuration.value)) ? Number(configuration.value) : 60;
+    return configuration && !isNaN(Number(configuration.value)) ? Number(configuration.value) : 3;
   }
 
   async getLimitOfSentNotificationsInMinute(): Promise<number> {
     const configuration = await this.configurationByKey(
       ConfigurationKeyEnum.LIMIT_OF_SENT_NOTIFICATIONS_IN_MINUTE
     );
-    return configuration && !isNaN(Number(configuration.value)) ? Number(configuration.value) : 10;
+    return configuration && !isNaN(Number(configuration.value)) ? Number(configuration.value) : 3;
   }
 }

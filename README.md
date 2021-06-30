@@ -51,8 +51,8 @@ Notifications Service is a Nodejs service used to notify customers in different 
   ```
     1- DEFAULT_SMS_SERVICE                    : Define the default SMS provider (AWS SNS)
     2- DEFAULT_PUSHER_SERVICE                 : Define the default SMS provider (Firebase)
-    3- QUEUE_DELAY_IN_SEC                     : Number of seconds queue will wait to send the notifications (60 sec)
-    4- LIMIT_OF_SENT_NOTIFICATIONS_IN_MINUTE  : Available notifications that will be sent in every queue job (10)
+    3- QUEUE_DELAY_IN_SEC                     : Number of seconds queue will wait to send the next notifications (has to be 60 sec, but for development purposes, it is 3 sec)
+    4- LIMIT_OF_SENT_NOTIFICATIONS_IN_MINUTE  : Available notifications that will be sent in every queue job (has to be 10, but for development purposes, it is 3 notifications)
   ```
 
 ## How to run it
@@ -98,6 +98,11 @@ Other microservices can contact this service in the RESTful way
 5- arBody        : Arabic body of sent SMS notification
 6- favoriteLang  : Customer favorite language
 ```
+
+## To display the running queues
+
+To display the the running queues jobs, you can go to this endpoint (only for development purposes)
+`http://localhost:4444/admin/queues`
 
 ## Testing
 
