@@ -79,6 +79,6 @@ describe('Push notifications suite case', () => {
 
     const queue: Queue = app.get(getQueueToken('PushNotifications'));
     const jobsCounts = await queue.getJobCounts();
-    expect(jobsCounts.delayed + jobsCounts.completed + jobsCounts.active).toBe(2);
+    expect(jobsCounts.delayed + jobsCounts.active).toBe(2);
   });
 });
