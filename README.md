@@ -1,75 +1,114 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# Notifications Service
 
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
-  
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://gitter.im/nestjs/nestjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://badges.gitter.im/nestjs/nestjs.svg" alt="Gitter" /></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Notifications Service is a Nodejs service used to notify customers in different ways.
 
-## Description
+#### Available notification types
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Push notifications
+- SMS notifications
 
-## Installation
+#### Available notification providers
+
+- For push notifications
+
+  - Firebase (default)
+  - One Signal
+
+- SMS notifications
+  - AWS SNS (default)
+  - Twilio
+
+## Service architecture
+
+- Nestjs is used to build this service which provides a great implementation for Dependency Injection and modularity structure
+
+- The major modules of this service are:
+
+  - Notification module
+  - SMS module
+  - Push module
+
+- Notification module is the parent and the others are his children
+
+- Composition over the inheritance. Composition is applied to implement Push and SMS sending behaviors
+
+- Strategy design pattern is applied to the notification types (Push strategy and SMS strategy)
+
+![Notification service architecture](public/notification-service-architecture.png?raw=true 'Notification service architecture')
+
+- With the help of this modularity and Strategy design pattern, we can extend this service in the ease with another notification type like Emails by implementing a new strategy for Emails
+
+- Providers are implemented in the same manner. The strategy design pattern has been applied on providers by which we can add more providers only by adding their strategies
+
+- The RESTful endpoints inputs take the same destinations array but under the hood, these destinations have to be valid phone numbers in the SMS endpoint and push tokens in the push endpoint
+
+- If destinations input was more than one destination, We implement the -sendToMulti- approach in which notifications will be added into queues to avoid providers rate limit
+
+- Configuration module has been provided to control the service behavior in run time without restarting the service. The available configuration for now:
+
+  ```
+    1- DEFAULT_SMS_SERVICE                    : Define the default SMS provider (AWS SNS)
+    2- DEFAULT_PUSHER_SERVICE                 : Define the default SMS provider (Firebase)
+    3- QUEUE_DELAY_IN_SEC                     : Number of seconds queue will wait to send the notifications (60 sec)
+    4- LIMIT_OF_SENT_NOTIFICATIONS_IN_MINUTE  : Available notifications that will be sent in every queue job (10)
+  ```
+
+## How to run it
+
+You can install this notification service via docker-compose.
 
 ```bash
-$ npm install
+docker-compose up
 ```
 
-## Running the app
+## How another microservice would contact this service to send a notification
+
+Other microservices can contact this service in the RESTful way
+
+#### To push notifications
+
+- Endpoint:
+  `http://localhost:4444/notifications/push`
+
+- Required data:
+
+```
+1- destinations  : Array of push tokens (like fcmTokens in firebase)
+2- enSubject     : English title of the pushed notification
+3- arSubject     : Arabic title of the pushed notification
+4- enBody        : English body of the pushed notification
+5- arBody        : Arabic body of the pushed notification
+6- favoriteLang  : Customer favorite language
+```
+
+#### To send SMS notifications
+
+- Endpoint:
+  `http://localhost:4444/notifications/sms`
+
+- Required data:
+
+```
+1- destinations  : Array of valid phone numbers
+2- enSubject     : English title of sent SMS notification
+3- arSubject     : Arabic title of sent SMS notification
+4- enBody        : English body of sent SMS notification
+5- arBody        : Arabic body of sent SMS notification
+6- favoriteLang  : Customer favorite language
+```
+
+## Testing
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run test
 ```
 
-## Test
+## Future improvements
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-  Nest is [MIT licensed](LICENSE).
+- Adding other notification approaches like (Emails notification)
+- Using other notification providers
+- Switch between providers in case of notification failure delivery
+- Replace REST with gRPC
+- Build a dedicated dashboard to monitor all notifications logs
+- Complete the configuration module to control the whole service behaviors
+- Implement an API Gateway to control authentication, authorization, routing and etc ...
