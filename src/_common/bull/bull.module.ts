@@ -6,7 +6,7 @@ import { env } from '../utils/env';
 import { QueueUIProvider } from './bull-board.provider';
 
 const connectionOptions = {
-    host: env.REDIS_HOST,
+    host: process.env.REDIS_HOST,
     port: +env.REDIS_PORT,
     password: env.REDIS_PASS
   },
