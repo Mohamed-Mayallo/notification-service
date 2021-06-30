@@ -34,7 +34,9 @@ Notifications Service is a Nodejs service used to notify customers in different 
 
 - Strategy design pattern is applied to the notification types (Push strategy and SMS strategy)
 
-![Notification service architecture](notification-service-architecture.png?raw=true 'Notification service architecture')
+<p align="center">
+  <img src="notification-service-architecture.png?raw=true" alt="Notification service architecture" title="Notification service architecture>
+</p>
 
 - With the help of this modularity and Strategy design pattern, we can extend this service in the ease with another notification type like Emails by implementing a new strategy for Emails
 
